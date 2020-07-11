@@ -24,13 +24,13 @@ The module provides a global table ***_ERR***
 The key ***T*** in this table contains a message which says what is going on in the code. So before every new task just like writing comments you write the comment about the task of the next section of the code in this key.   
 
 For example:
-
+```Lua
 	require("errorH")
 	_ERR.T = "Run loop to count from 1 to 10"
 	for i = 1,10 do
 		print(i)
 	end
-
+```
 Just go about writing code the normal way. For code that follows the nil,message convention there will be some error when the nil returned is used somewhere.  
 This does not mean however that for situations where nil is returned and can be handled by the local code should not check for and handle the nil.   
 Because if the code can handle the nil it is not an error. SEE: [What are errors](#what-are-errors) above. errorH module is for handling errors.   
