@@ -15,11 +15,11 @@ WHAT ARE ERRORS?
 
 
 -- MECHANISM
--- Provide a global table _ERRORH
+-- Provide a global table _ERR
 -- The key "T" contains a message which says what is going on in the code. So before every new task just like writing comments you write the comment about the task of the next section of the code in this key
 -- Just go about writing code the normal way. For code that follows the nil,message convention there will be some error when the nil returned is used somewhere. This does not mean however that for situations where nil is returned and can be handled by the local code should not check for and handle the nil. Because if the code can handle the nil it is not an error. SEE: What are Errors above. errorH module is for handling errors. For the code that throws errors there is an exception generated. So we end up throwing exceptions the Lua way.
 -- You also have the option of converting functions following the nil,message convention to the ones that throw errors using the unprotect function
--- Now at whatever level you want to catch the exceptions that level should protect the function. And now if it generates teh error it should refer to _ERR.T to report which task generated the error and also run its finalizer.
+-- Now at whatever level you want to catch the exceptions that level should protect the function. And now if it generates the error it should refer to _ERR.T to report which task generated the error and also run its finalizer.
 -- FINALIZERS
 -- errorH gives a mechanism to create finalizers. These finalizers will be run if the error is caught anywhere using pcall or xpcall. Whenever there is an error the error handler defined below will check the code level where the error happenned and if a finalizer is defined there will run it before the stack is unwound. It will do that for all levels in the stack till where the pcall or xpcall was initiated.
 -- To define a finalizer just set: _ERR_TryWithFinal = f where f is the finalizer function.
@@ -50,7 +50,8 @@ _ERR = {}	-- Make a new _ERR table as a global table which can be referred anywh
 local _ERR = _ERR
 
 
-
+local _VERSION = "2020.07.11.01"
+local xpcallWargs,_
 local data = {T=""}	-- data table to hold the message of what is being done currently in the code.
 local DEBUG
 
@@ -59,7 +60,7 @@ local errorHMeta = {
 		if k == "T" then
 			data.T = v or ""
 			if DEBUG then
-				DEBUG("DEBUG Message:"..data.T)
+				DEBUG(data.T)
 			end
 		elseif k == "DEBUG" then
 			if v and type(v) == "function" then
@@ -77,6 +78,8 @@ local errorHMeta = {
 			return data.T
 		elseif k == "DEBUG" then
 			return DEBUG
+		elseif k == "_VERSION" then
+			return _VERSION
 		else
 			return nil
 		end
@@ -90,7 +93,7 @@ local function errorHand(err,stLvl)
 	local level = stLvl or 2	
 	local f = debug.getinfo(level,"f")
 	local done,index
-	while not done and f do
+	while not done and f and f.func and type(f.func) == "function" do
 		--print("FUNCTION: ",debug.getinfo(level,"n").name,f.func)
 		-- Check all upvalues to see whether we are at the pcall or xpcall functions defined below since for them data table above is a upvalue
 		index = 1
@@ -128,10 +131,26 @@ local function errorHand(err,stLvl)
 	return err
 end
 
+do
+	-- Check oldxpcall whether it takes arguments or not
+	local f = function(arg)
+		return arg
+	end
+	_,xpcallWargs = oldxpcall(f,function() end,1)
+end
+
 -- Redefine pcall to use my error handler
 function pcall(f,...)
 	local x = data
-	return oldxpcall(f,errorHand,...)
+	if xpcallWargs then
+		return oldxpcall(f,errorHand,...)
+	else
+		local arg = {...}
+		local func = function()
+			return f(unpack(arg))
+		end
+		return oldxpcall(func,errorHand)
+	end
 end
 
 --print(pcall)
@@ -143,7 +162,15 @@ function xpcall(f,eH,...)
 		errorHand(err,3)	-- My Error handler to run all finalizers
 		return unpack(ret,2)
 	end
-	return oldxpcall(f,errHand,...)
+	if xpcallWargs then
+		return oldxpcall(f,errHand,...)
+	else
+		local arg = {...}
+		local func = function()
+			return f(unpack(arg))
+		end
+		return oldxpcall(func,errorHand)
+	end		
 end
 
 function _ERR.unprotect(f)
