@@ -14,7 +14,7 @@ The main motivation is to let Lua itself handle Errors and not add layers of fun
 With this implementation there are some other perks that come with it like code commenting mechanism that also helps produce more meaningful customized error messages.
 
 
-# What are errors?
+# What are errors
 Errors are situations where the program is not able to handle the response and would throw the message all the way above it.
 
 
@@ -31,7 +31,7 @@ For example:
 
 Just go about writing code the normal way. For code that follows the nil,message convention there will be some error when the nil returned is used somewhere.  
 This does not mean however that for situations where nil is returned and can be handled by the local code should not check for and handle the nil.   
-Because if the code can handle the nil it is not an error. SEE: [What are errors?](#what-are-errors?) above. errorH module is for handling errors. For the code that throws errors there is an exception generated. So we end up throwing exceptions the Lua way.
+Because if the code can handle the nil it is not an error. SEE: [What are errors](#what-are-errors) above. errorH module is for handling errors. For the code that throws errors there is an exception generated. So we end up throwing exceptions the Lua way.
  You also have the option of converting functions following the nil,message convention to the ones that throw errors using the unprotect function
  Now at whatever level you want to catch the exceptions that level should protect the function. And now if it generates the error it should refer to _ERR.T to report which task generated the error and also run its finalizer.
  FINALIZERS
