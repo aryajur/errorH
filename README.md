@@ -24,11 +24,12 @@ The module provides a global table ***_ERR***
 The key ***T*** in this table contains a message which says what is going on in the code. So before every new task just like writing comments you write the comment about the task of the next section of the code in this key.   
 
 For example:
-		require("errorH")
-		_ERR.T = "Run loop to count from 1 to 10"
-		for i = 1,10 do
-			print(i)
-		end
+
+	require("errorH")
+	_ERR.T = "Run loop to count from 1 to 10"
+	for i = 1,10 do
+		print(i)
+	end
 
 Just go about writing code the normal way. For code that follows the nil,message convention there will be some error when the nil returned is used somewhere.  
 This does not mean however that for situations where nil is returned and can be handled by the local code should not check for and handle the nil.   
@@ -63,6 +64,7 @@ Functions that throw an error can be protected to return nil on error using the 
 	
 ## Example
 Now at whatever level you want to catch the exceptions that level should protect the function. And now if it generates the error it should refer to ***_ERR.T*** to report which task generated the error and also run its finalizer.
+
 	require("errorH")
 
 	function readNonExistantFile()
@@ -86,6 +88,7 @@ Now at whatever level you want to catch the exceptions that level should protect
  To end the scope of the code where the finalizer needs to run either do ***_ERR_TryWithFinal*** = nil or do ***_ERR.EndTryWithFinal()***
  
  ## Example
+ 
  	require("errorH")
 
 	function readNonExistantFile()
