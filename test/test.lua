@@ -4,10 +4,9 @@ require("errorH")
 
 print("Going into test")
 fr = require("fileReader")
-stat = {pcall(fr.readNonExistantFile)}
+preadNonExistantFile = _ERR.protect(fr.readNonExistantFile)
+stat = {preadNonExistantFile()}
 if not stat[1] then
-	print("Error while ".._ERRORH.T,stat[2])
-	print("running finalizer")
-	_ERRORH.F()
+	print("Error while doing:".._ERR.T,stat[2])
 end
 print("end program")

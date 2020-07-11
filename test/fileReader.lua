@@ -1,4 +1,4 @@
-local _ERRORH = _ERRORH
+local _ERR = _ERR
 local io = io
 
 local M = {}
@@ -11,12 +11,12 @@ end
 
 
 function readNonExistantFile()
-	_ERRORH.T = "Reading file mrx.txt"
+	_ERR.T = "Reading file mrx.txt"
 	local f
-	local function final()
+	local _ERR_TryWithFinal = function()	-- Finalizer FUnction
+		print("running finalizer")
 		if f then f:close() end
 	end
-	_ERRORH.F = final
 	f = io.open("mrx.txt")
 	f:read("*a")
 	f:close()
