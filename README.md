@@ -38,7 +38,7 @@ For the code that throws errors there is an exception generated. So we end up th
 
 ## Unprotect functions
 You also have the option of converting functions following the nil,message convention to the ones that throw errors using the ***unprotect*** function:
-
+```Lua
 	require("errorH")
 	function trimString(arg1)
 		if type(arg1) ~= "string" then
@@ -47,11 +47,11 @@ You also have the option of converting functions following the nil,message conve
 		return arg1:gsub("^%s*","")
 	end
 	utrimString = _ERR.unprotect(trimString)
-
+```
 
 ## Protect functions
 Functions that throw an error can be protected to return nil on error using the ***protect*** function:
-
+```Lua
 	require("errorH")
 	function trimString(arg1)
 		if type(arg1) ~= "string" then
@@ -60,11 +60,11 @@ Functions that throw an error can be protected to return nil on error using the 
 		return arg1:gsub("^%s*","")
 	end
 	utrimString = _ERR.protect(trimString)
-
+```
 	
 ## Example
 Now at whatever level you want to catch the exceptions that level should protect the function. And now if it generates the error it should refer to ***_ERR.T*** to report which task generated the error and also run its finalizer.
-
+```Lua
 	require("errorH")
 
 	function readNonExistantFile()
@@ -81,14 +81,14 @@ Now at whatever level you want to catch the exceptions that level should protect
 		print("Error while doing:".._ERR.T,stat[2])
 	end
 	print("end program")
-
+```
 # FINALIZERS
 ***errorH*** gives a mechanism to create finalizers. These finalizers will be run if the error is caught anywhere using pcall or xpcall. Whenever there is an error the error handler will check the code level where the error happenned and if a finalizer is defined there will run it before the stack is unwound. It will do that for all levels in the stack till where the pcall or xpcall was initiated.
  To define a finalizer just set: ***_ERR_TryWithFinal*** = f where f is the finalizer function.
  To end the scope of the code where the finalizer needs to run either do ***_ERR_TryWithFinal*** = nil or do ***_ERR.EndTryWithFinal()***
  
  ## Example
- 
+ ```Lua
  	require("errorH")
 
 	function readNonExistantFile()
@@ -109,7 +109,7 @@ Now at whatever level you want to catch the exceptions that level should protect
 		print("Error while doing:".._ERR.T,stat[2])
 	end
 	print("end program")
-
+```
 # Extensions
 If ***_ERR.DEBUG*** is set to a function then that function is called whenever ***_ERR.T*** is set to a new value. The argument given to the function is the value assigned to ***_ERR.T***.
 This allows ways to extend the functionality by adding a function. So the messages may be stacked, logged or parsed for creating certain actions.
