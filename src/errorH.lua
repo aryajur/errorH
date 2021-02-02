@@ -50,7 +50,7 @@ _ERR = {}	-- Make a new _ERR table as a global table which can be referred anywh
 local _ERR = _ERR
 
 
-local _VERSION = "2020.07.11.01"
+local _VERSION = "2021.02.01.01"
 local xpcallWargs,_
 local data = {T=""}	-- data table to hold the message of what is being done currently in the code.
 local DEBUG
@@ -60,7 +60,7 @@ local errorHMeta = {
 		if k == "T" then
 			data.T = v or ""
 			if DEBUG then
-				DEBUG(data.T)
+				pcall(DEBUG,data.T)
 			end
 		elseif k == "DEBUG" then
 			if v and type(v) == "function" then
