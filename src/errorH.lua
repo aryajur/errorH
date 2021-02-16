@@ -44,13 +44,15 @@ local type = type
 local print = print
 local oldpcall = pcall
 local oldxpcall = xpcall
+local oldassert = assert
+local newassert
 
 
 _ERR = {}	-- Make a new _ERR table as a global table which can be referred anywhere in the code.
 local _ERR = _ERR
 
 
-local _VERSION = "2021.02.01.01"
+local _VERSION = "2021.02.15.01"
 local xpcallWargs,_
 local data = {T=""}	-- data table to hold the message of what is being done currently in the code.
 local DEBUG
@@ -65,6 +67,7 @@ local errorHMeta = {
 		elseif k == "DEBUG" then
 			if v and type(v) == "function" then
 				DEBUG = v
+				assert = newassert
 			elseif v then
 				DEBUG = print
 			else
@@ -171,6 +174,15 @@ function xpcall(f,eH,...)
 		end
 		return oldxpcall(func,errorHand)
 	end		
+end
+
+-- Redefine assert function to create _ERR.T entry that an error happenned
+function newassert(v,message)
+	if not v then
+		_ERR.T = "Error! "..(message and type(message)=="string" and message)
+		return oldassert(nil,message)
+	end
+	return v,message
 end
 
 function _ERR.unprotect(f)
